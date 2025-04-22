@@ -25,8 +25,8 @@
       </div>
       <div class="chart-info">
         <h3>{{$t('currencyExchageRatesBaseEuro')}} </h3>
-        <p>{{$t('dateRange')}}</p>
-        <p> {{$t('baseCurrency')}} EUR</p>
+        <p>{{ dateRangeText }}</p>
+        <p> {{$t('baseCurrency')}} {{ baseCurrency }}</p>
       </div>
     </div>
   </v-skeleton-loader>
@@ -34,17 +34,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed , onMounted} from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
- import { useStore } from 'vuex'
- const store = useStore()
- onMounted(() => {
-  store.dispatch('fetchExchangeRatesFromDates');
-})
-const loading  = computed(() => store.state.loadingChart)
-const rateData = computed(() => store.state.chartRated)
-const error = computed(() => store.state.chartError)
+import { store } from '../store';
+
+onMounted(() => {
+  store.dispatch('fetchLastFiveDaysRates');
+});
+
+const loading = computed(() => store.state.loadingChart);
+const rateData = computed(() => store.state.chartRated);
+const error = computed(() => store.state.chartError);
+const baseCurrency = computed(() => store.state.baseCurrency);
+
+// Calculate date range text
+const dateRangeText = computed(() => {
+  if (!rateData.value) return 'Date range: -';
+  const dates = Object.keys(rateData.value).sort();
+  const lastFiveDates = dates.slice(-5);
+  const start = new Date(lastFiveDates[0]);
+  const end = new Date(lastFiveDates[lastFiveDates.length - 1]);
+  return `Date range: ${start.toDateString()} - ${end.toDateString()}`;
+});
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -84,7 +96,7 @@ const chartOptions = {
       font: {
         family: 'Inter, system-ui, sans-serif',
         size: 16,
-        weight: 'bold'
+        weight: 'bold' as const
       },
       padding: {
         top: 10,
@@ -99,8 +111,7 @@ const chartOptions = {
       borderWidth: 1,
       cornerRadius: 8,
       padding: 12,
-      boxPadding: 6,
-      usePointStyle: true,
+      displayColors: true,
       callbacks: {
         label: function(context: any) {
           return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}`;
@@ -109,34 +120,35 @@ const chartOptions = {
     }
   },
   scales: {
+    y: {
+      beginAtZero: true,
+      grid: {
+        color: 'rgba(0, 0, 0, 0.1)'
+      },
+      ticks: {
+        font: {
+          family: 'Inter, system-ui, sans-serif',
+          size: 12
+        },
+        padding: 10
+      }
+    },
     x: {
       grid: {
         display: false
       },
       ticks: {
         font: {
-          family: 'Inter, system-ui, sans-serif'
-        }
-      }
-    },
-    y: {
-      beginAtZero: false,
-      grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
-      },
-      ticks: {
-        font: {
-          family: 'Inter, system-ui, sans-serif'
+          family: 'Inter, system-ui, sans-serif',
+          size: 12
         },
-        callback: function(value: number) {
-          return value.toFixed(2);
-        }
+        padding: 10
       }
     }
   },
   animation: {
     duration: 1000,
-    easing: 'easeOutQuart'
+    easing: 'easeInOutQuart' as const
   }
 };
 
@@ -164,11 +176,13 @@ const chartData = computed<ChartData>(() => {
   }
 
   const dates = Object.keys(rateData.value).sort();
+  const datesToUse =  dates;
+  
   const datasets = selectedCurrencies.value.map((currency, index) => {
     const colorIndex = index % colorPalette.length;
     return {
       label: currency,
-      data: dates.map(date => rateData.value[date][currency] || 0),
+      data: datesToUse.map(date => rateData.value[date][currency] || 0),
       backgroundColor: colorPalette[colorIndex].backgroundColor,
       borderColor: colorPalette[colorIndex].borderColor,
       borderWidth: 1
@@ -176,7 +190,7 @@ const chartData = computed<ChartData>(() => {
   });
 
   return {
-    labels: dates.map(formatDate),
+    labels: datesToUse.map(formatDate),
     datasets
   };
 });

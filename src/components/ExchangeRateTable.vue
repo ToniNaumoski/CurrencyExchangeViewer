@@ -23,38 +23,47 @@
 </div>
 </template>
 <script setup lang="ts">
-  import { computed, watch } from 'vue'
- import { useStore } from 'vuex'
- import { useI18n } from 'vue-i18n'
- const store = useStore()
- const emptyTableData = computed(() => store.state.emptyTableData)
- const rates = computed(() => store.state.rates)
- const loading = computed(() => store.state.loading)
- const error = computed(() => store.state.error)
+  import { computed } from 'vue'
+  import { store } from '../store'
+  import { useI18n } from 'vue-i18n'
+  
+  const rates = computed(() => store.state.rates)
+  const loading = computed(() => store.state.loading)
+  const error = computed(() => store.state.error)
 
-const { locale, messages } = useI18n()
+  const { locale, messages } = useI18n()
 
-const currencyTable = computed(() => {
-  const rates = store.state.rates || {}
-  const currentLocale = locale.value === 'en-US' ? 'en-US' : 'mk-MK'
-  const localeCurrencies = messages.value[currentLocale]?.currencies || {}
+  interface CurrencyInfo {
+    name: string;
+    country: string;
+  }
 
-  return Object.entries(rates).map(([code, rate]) => {
-    const currencyInfo = localeCurrencies[code] || {}
-    return {
-      code,
-      name: currencyInfo.name || 'N/A',
-      country: currencyInfo.country || 'N/A',
-      rate
-    }
+  interface LocaleMessages {
+    currencies: Record<string, CurrencyInfo>;
+  }
+
+  const currencyTable = computed(() => {
+    const rates = store.state.rates || {}
+    const currentLocale = locale.value === 'en-US' ? 'en-US' : 'mk-MK'
+    const rawMessages = messages.value[currentLocale]
+    const localeMessages = (rawMessages as unknown as LocaleMessages) || { currencies: {} }
+    const localeCurrencies = localeMessages.currencies || {}
+
+    return Object.entries(rates).map(([code, rate]) => {
+      const currencyInfo = localeCurrencies[code] || { name: 'N/A', country: 'N/A' }
+      return {
+        code,
+        name: currencyInfo.name,
+        country: currencyInfo.country,
+        rate
+      }
+    })
   })
-})
 
   const headers = [
-  { title: 'Currency', key: 'code' },
-  { title: 'Name', key: 'name' },
-  { title: 'Country', key: 'country' },
-  { title: 'Rate', key: 'rate' }
-]
-
+    { title: 'Currency', key: 'code' },
+    { title: 'Name', key: 'name' },
+    { title: 'Country', key: 'country' },
+    { title: 'Rate', key: 'rate' }
+  ]
 </script>

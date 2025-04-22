@@ -1,21 +1,23 @@
 <template>
   <div class="d-flex align-center justify-center">
-     <v-btn-tertiary
+     <v-btn
       value="en"
       size="small"
-      :active="currentLocale === 'en-US'"
+      :color="currentLocale === 'en-US' ? 'primary' : 'grey'"
       @click="setLocale('en-US')"
+      class="mx-1"
     >
       English
-    </v-btn-tertiary>
-  <v-btn-tertiary
+    </v-btn>
+  <v-btn
       value="mk"
       size="small"
-      :active="currentLocale === 'mk-MK'"
+      :color="currentLocale === 'mk-MK' ? 'primary' : 'grey'"
       @click="setLocale('mk-MK')"
+      class="mx-1"
     >
       Македонски
-    </v-btn-tertiary>
+    </v-btn>
   </div>
 </template>
 

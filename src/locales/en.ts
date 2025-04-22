@@ -1,28 +1,6 @@
 import type { LocaleTranslations } from '../types/locale';
 
 const en: LocaleTranslations = {
-  // currencies: {
-  //   USD: { name: "US Dollar", country: "United States" },
-  //   EUR: { name: "Euro", country: "European Union" },
-  //   JPY: { name: "Japanese Yen", country: "Japan" },
-  //   GBP: { name: "British Pound", country: "United Kingdom" },
-  //   AUD: { name: "Australian Dollar", country: "Australia" },
-  //   CAD: { name: "Canadian Dollar", country: "Canada" },
-  //   CHF: { name: "Swiss Franc", country: "Switzerland" },
-  //   CNY: { name: "Chinese Yuan", country: "China" },
-  //   SEK: { name: "Swedish Krona", country: "Sweden" },
-  //   NZD: { name: "New Zealand Dollar", country: "New Zealand" },
-  //   MXN: { name: "Mexican Peso", country: "Mexico" },
-  //   SGD: { name: "Singapore Dollar", country: "Singapore" },
-  //   HKD: { name: "Hong Kong Dollar", country: "Hong Kong" },
-  //   NOK: { name: "Norwegian Krone", country: "Norway" },
-  //   KRW: { name: "South Korean Won", country: "South Korea" },
-  //   INR: { name: "Indian Rupee", country: "India" },
-  //   RUB: { name: "Russian Ruble", country: "Russia" },
-  //   ZAR: { name: "South African Rand", country: "South Africa" },
-  //   TRY: { name: "Turkish Lira", country: "Turkey" },
-  //   BRL: { name: "Brazilian Real", country: "Brazil" }
-  // },
   currencies: {
     AUD: { name: "Australian Dollar", country: "Australia" },
     BGN: { name: "Bulgarian Lev", country: "Bulgaria" },
